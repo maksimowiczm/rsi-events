@@ -1,0 +1,11 @@
+{
+  "ConnectionStrings": {
+    "RabbitMQ": "localhost"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}

@@ -1,0 +1,5 @@
+bin/
+obj/
+.idea/
+global.json
+*.Development.json
