@@ -1,8 +1,10 @@
 use futures_lite::stream::StreamExt;
 use lapin::options::{BasicAckOptions, BasicConsumeOptions, QueueDeclareOptions};
 use lapin::types::FieldTable;
+use log::info;
 use serde::Deserialize;
 use std::collections::HashMap;
+use std::env;
 
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
@@ -19,7 +21,9 @@ struct EventVisit {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let addr = "amqp://localhost:5672/%2f";
+    env_logger::init();
+
+    let addr = env::var("AMQP_ADDR").unwrap_or_else(|_| "amqp://localhost:5672/%2f".into());
 
     let connection =
         lapin::Connection::connect(&addr, lapin::ConnectionProperties::default()).await?;
@@ -46,6 +50,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await?;
 
     let mut visits = HashMap::new();
+
+    info!("Listening for events on the 'events' queue");
 
     while let Some(delivery) = consumer.next().await {
         let delivery = delivery?;
