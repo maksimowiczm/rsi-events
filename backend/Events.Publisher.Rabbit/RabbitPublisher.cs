@@ -5,16 +5,22 @@ using RabbitMQ.Client;
 
 namespace Events.Publisher.Rabbit;
 
-public class RabbitPublisher(string hostName) : IPublisher
+public class RabbitPublisher : IPublisher, IDisposable
 {
-    private readonly ConnectionFactory _factory = new() { HostName = hostName };
+    private readonly IConnection _connection;
+    private readonly IModel _channel;
+
+    public RabbitPublisher(string hostName)
+    {
+        var factory = new ConnectionFactory { HostName = hostName };
+        _connection = factory.CreateConnection();
+        _channel = _connection.CreateModel();
+
+        _channel.QueueDeclare("events", true, false, false, null);
+    }
 
     public Task PublishAsync(INotification notification)
     {
-        using var connection = _factory.CreateConnection();
-        using var channel = connection.CreateModel();
-
-        channel.QueueDeclare("events", true, false, false, null);
         var json = JsonConvert.SerializeObject(notification, new JsonSerializerSettings
         {
             ContractResolver = new DefaultContractResolver
@@ -24,8 +30,14 @@ public class RabbitPublisher(string hostName) : IPublisher
         });
         var body = Encoding.UTF8.GetBytes(json);
 
-        channel.BasicPublish("", "events", null, body);
+        _channel.BasicPublish("", "events", null, body);
 
         return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        _connection.Dispose();
+        _channel.Dispose();
     }
 }

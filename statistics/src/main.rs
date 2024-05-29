@@ -2,12 +2,19 @@ use futures_lite::stream::StreamExt;
 use lapin::options::{BasicAckOptions, BasicConsumeOptions, QueueDeclareOptions};
 use lapin::types::FieldTable;
 use serde::Deserialize;
+use std::collections::HashMap;
 
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
-struct Event {
+struct EventCreate {
     title: String,
     date: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[allow(dead_code)]
+struct EventVisit {
+    id: String,
 }
 
 #[tokio::main]
@@ -38,12 +45,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .await?;
 
+    let mut visits = HashMap::new();
+
     while let Some(delivery) = consumer.next().await {
         let delivery = delivery?;
-        let data = delivery.data;
 
-        let event: Event = serde_json::from_slice(&data).unwrap();
-        dbg!(event);
+        if let Ok(visit) = serde_json::from_slice::<EventVisit>(&delivery.data) {
+            let visits = *visits
+                .entry(visit.id.clone())
+                .and_modify(|c| *c += 1)
+                .or_insert(0);
+
+            println!("Event {} has {} visits", visit.id, visits + 1)
+        } else if let Ok(event) = serde_json::from_slice::<EventCreate>(&delivery.data) {
+            println!("Event created: {:?}", event);
+        }
 
         channel_events
             .basic_ack(delivery.delivery_tag, BasicAckOptions::default())

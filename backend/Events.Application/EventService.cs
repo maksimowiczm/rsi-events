@@ -45,21 +45,34 @@ public class EventService
         return false;
     }
 
-    public EventDto? GetEvent(Guid id)
+    public async Task<EventDto?> GetEventAsync(Guid id)
     {
         var @event = _eventRepository.GetEvent(id);
-        return @event?.MapToDto();
+        if (@event is null)
+        {
+            return null;
+        }
+
+        @event.Visit();
+        await _unitOfWork.SaveChangesAsync();
+
+        return @event.MapToDto();
     }
 
-    public IEnumerable<EventDto> GetEvents()
+    public async Task<IEnumerable<EventDto>> GetEventsAsync()
     {
-        var events = _eventRepository.GetEvents();
+        var events = _eventRepository.GetEvents().ToList();
+        events.ForEach(e => e.Visit());
+        await _unitOfWork.SaveChangesAsync();
+
         return events.Select(e => e.MapToDto());
     }
-    
-    public IEnumerable<EventDto> GetEventsBetweenDates(DateTime start, DateTime end)
+
+    public async Task<IEnumerable<EventDto>> GetEventsBetweenDatesAsync(DateTime start, DateTime end)
     {
-        var events = _eventRepository.GetEventsBetweenDates(start, end);
+        var events = _eventRepository.GetEventsBetweenDates(start, end).ToList();
+        events.ForEach(e => e.Visit());
+        await _unitOfWork.SaveChangesAsync();
         return events.Select(e => e.MapToDto());
     }
 }

@@ -30,15 +30,15 @@ app.MapGet("/events", (EventService service, DateTime? start, DateTime? end) =>
 {
     if (start is not null && end is not null)
     {
-        return service.GetEventsBetweenDates(start.Value, end.Value);
+        return service.GetEventsBetweenDatesAsync(start.Value, end.Value);
     }
 
-    return service.GetEvents();
+    return service.GetEventsAsync();
 });
 
-app.MapGet("/events/{id:guid}", (EventService service, Guid id) =>
+app.MapGet("/events/{id:guid}", async (EventService service, Guid id) =>
 {
-    var dto = service.GetEvent(id);
+    var dto = await service.GetEventAsync(id);
     return dto is not null ? Results.Ok(dto) : Results.NotFound();
 });
 

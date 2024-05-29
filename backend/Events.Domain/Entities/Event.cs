@@ -31,4 +31,6 @@ public class Event : DomainEventsAggregate
         EventType = eventType ?? EventType;
         Date = date ?? Date;
     }
+
+    public void Visit() => Raise(new EventVisited(Id));
 }
