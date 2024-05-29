@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  nginx:
+    build: .
+    ports:
+      - "443:443"
+    depends_on:
+      backend:
+        condition: service_started
+    volumes:
+      - "./nginx.conf:/etc/nginx/nginx.conf:ro"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./Events/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - "ASPNETCORE_URLS=http://+:5000"
+      - "ConnectionStrings:RabbitMQ=rabbitmq"
+
+  statistics:
+    build:
+      context: ./statistics
+      dockerfile: Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      AMQP_ADDR: "amqp://rabbitmq:5672/%2f"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    ports:
+      - "15672:15672"
