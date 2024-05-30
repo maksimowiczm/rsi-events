@@ -23,7 +23,7 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-app.MapGet("/events", (EventService service, DateTime? start, DateTime? end) =>
+app.MapGet("/api/events", (EventService service, DateTime? start, DateTime? end) =>
 {
     if (start is not null && end is not null)
     {
@@ -33,13 +33,13 @@ app.MapGet("/events", (EventService service, DateTime? start, DateTime? end) =>
     return service.GetEventsAsync();
 });
 
-app.MapGet("/events/{id:guid}", async (EventService service, Guid id) =>
+app.MapGet("/api/events/{id:guid}", async (EventService service, Guid id) =>
 {
     var dto = await service.GetEventAsync(id);
     return dto is not null ? Results.Ok(dto) : Results.NotFound();
 });
 
-app.MapPost("/events",
+app.MapPost("/api/events",
     async (EventService service, string title, string description, string type, DateTime date) =>
     {
         var dto = await service.CreateEventAsync(title, description, type, date);
@@ -47,7 +47,7 @@ app.MapPost("/events",
     }
 );
 
-app.MapPut("/events/{id:guid}",
+app.MapPut("/api/events/{id:guid}",
     async (EventService service, Guid id, string? title, string? description, string? type, DateTime? date) =>
     {
         var result = await service.UpdateEventAsync(id, title, description, type, date);
