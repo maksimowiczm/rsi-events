@@ -35,6 +35,19 @@ impl EventService {
         fetched_events
     }
 
+    pub async fn get_event(&self, id: &str) -> EventEntity {
+        let url = format!("/api/events/{}", id);
+        let fetched_event: EventEntity = Request::get(&url)
+            .send()
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap();
+
+        fetched_event
+    }
+
     pub async fn create_event(
         &self,
         name: String,
@@ -51,6 +64,31 @@ impl EventService {
             date,
         };
         Request::post(url)
+            .header("Content-Type", "application/json")
+            .body(serde_json::to_string(&event).unwrap())
+            .unwrap()
+            .send()
+            .await
+            .unwrap();
+    }
+
+    pub async fn update_event(
+        &self,
+        id: &str,
+        name: String,
+        description: String,
+        event_type: String,
+        date: String,
+    ) {
+        let url = format!("/api/events/{}", id);
+        let event = EventEntity {
+            id: "".to_string(),
+            title: name,
+            description,
+            event_type,
+            date,
+        };
+        Request::put(&url)
             .header("Content-Type", "application/json")
             .body(serde_json::to_string(&event).unwrap())
             .unwrap()

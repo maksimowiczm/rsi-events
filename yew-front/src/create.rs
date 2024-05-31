@@ -5,7 +5,7 @@ use yew::prelude::*;
 pub fn Create() -> Html {
     html! {
         <div>
-            <EventCreator />
+            <EventCreator event={None} />
         </div>
     }
 }

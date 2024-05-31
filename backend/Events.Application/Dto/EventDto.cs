@@ -12,6 +12,6 @@ internal static class EventMapper
             @event.Title,
             @event.Description,
             @event.EventType,
-            @event.Date.ToUniversalTime().ToShortDateString()
+            @event.Date.ToUniversalTime().ToString("yyyy-MM-dd")
         );
 }

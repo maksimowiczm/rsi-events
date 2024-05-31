@@ -3,9 +3,11 @@ use yew::prelude::*;
 mod api;
 mod components;
 mod create;
+mod edit;
 mod home;
 
 use crate::create::Create;
+use crate::edit::Edit;
 use crate::home::Home;
 use yew_router::prelude::*;
 
@@ -15,12 +17,15 @@ pub enum Route {
     Home,
     #[at("/create")]
     Create,
+    #[at("/edit/:id")]
+    Edit { id: String },
 }
 
 fn switch(routes: Route) -> Html {
     match routes {
         Route::Home => html! { <Home /> },
         Route::Create => html! { <Create /> },
+        Route::Edit { id } => html! { <Edit id={id} /> },
     }
 }
 

@@ -1,5 +1,7 @@
 use crate::api::event_service::EventEntity;
+use crate::Route;
 use yew::prelude::*;
+use yew_router::prelude::*;
 
 #[derive(PartialEq, Properties)]
 pub struct EventListProps {
@@ -54,7 +56,10 @@ pub fn EventComponent(EventComponentProps { event }: &EventComponentProps) -> Ht
             </div>
             <div class={"flex flex-col"}>
                 <div class={"grow"}></div>
-                <button class={"bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full "}>{"pdf"}</button>
+                <button class={"m-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"}>
+                    <Link<Route> to={Route::Edit { id: event.id.clone() }}>{"edit"}</Link<Route>>
+                </button>
+                <button class={"m-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full "}>{"pdf"}</button>
             </div>
         </div>
     }

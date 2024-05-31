@@ -1,3 +1,4 @@
+use crate::api::event_service::EventEntity;
 use std::collections::HashMap;
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
@@ -11,8 +12,10 @@ enum CreatorField {
     Date,
 }
 
+#[derive(Debug)]
 pub enum Msg {
-    Submit,
+    Create,
+    Update,
     Wait,
 }
 
@@ -23,9 +26,32 @@ pub struct EventCreator {
     waiting: bool,
 }
 
+impl EventCreator {
+    fn get_field_value(&mut self, field: &CreatorField) -> String {
+        let value = self
+            .refs
+            .get(field)
+            .unwrap()
+            .cast::<HtmlInputElement>()
+            .unwrap()
+            .value();
+
+        if value.is_empty() {
+            self.error = true;
+        }
+
+        value
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct EventCreatorProps {
+    pub event: Option<EventEntity>,
+}
+
 impl Component for EventCreator {
     type Message = Msg;
-    type Properties = ();
+    type Properties = EventCreatorProps;
 
     fn create(_: &Context<Self>) -> Self {
         let mut refs = HashMap::new();
@@ -41,47 +67,53 @@ impl Component for EventCreator {
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::Submit => {
-                let mut error = false;
+            Msg::Create => {
+                let name = self.get_field_value(&CreatorField::Name);
+                let description = self.get_field_value(&CreatorField::Description);
+                let event_type = self.get_field_value(&CreatorField::Type);
+                let date = self.get_field_value(&CreatorField::Date);
 
-                let mut get_field_value = |field: &CreatorField| {
-                    let value = self
-                        .refs
-                        .get(field)
-                        .unwrap()
-                        .cast::<HtmlInputElement>()
-                        .unwrap()
-                        .value();
-
-                    if value.is_empty() {
-                        error = true;
-                    }
-
-                    value
-                };
-
-                let name = get_field_value(&CreatorField::Name);
-                let description = get_field_value(&CreatorField::Description);
-                let event_type = get_field_value(&CreatorField::Type);
-                let date = get_field_value(&CreatorField::Date);
-
-                if error {
-                    self.error = true;
+                if self.error {
                     return true;
                 }
 
-                {
-                    let navigator = ctx.link().navigator().unwrap();
+                let navigator = ctx.link().navigator().unwrap();
 
-                    wasm_bindgen_futures::spawn_local(async move {
-                        let event_service = crate::api::event_service::EventService::new();
-                        event_service
-                            .create_event(name, description, event_type, date)
-                            .await;
+                wasm_bindgen_futures::spawn_local(async move {
+                    let event_service = crate::api::event_service::EventService::new();
+                    event_service
+                        .create_event(name, description, event_type, date)
+                        .await;
 
-                        navigator.push(&crate::Route::Home);
-                    });
+                    navigator.push(&crate::Route::Home);
+                });
+
+                ctx.link().send_message(Msg::Wait);
+
+                false
+            }
+            Msg::Update => {
+                let name = self.get_field_value(&CreatorField::Name);
+                let description = self.get_field_value(&CreatorField::Description);
+                let event_type = self.get_field_value(&CreatorField::Type);
+                let date = self.get_field_value(&CreatorField::Date);
+
+                if self.error {
+                    return true;
                 }
+
+                let navigator = ctx.link().navigator().unwrap();
+                let id = ctx.props().event.as_ref().unwrap().id.clone();
+
+                wasm_bindgen_futures::spawn_local(async move {
+                    let event_service = crate::api::event_service::EventService::new();
+
+                    event_service
+                        .update_event(&id, name, description, event_type, date)
+                        .await;
+
+                    navigator.push(&crate::Route::Home);
+                });
 
                 ctx.link().send_message(Msg::Wait);
 
@@ -99,14 +131,25 @@ impl Component for EventCreator {
         let description = self.refs.get(&CreatorField::Description).unwrap();
         let event_type = self.refs.get(&CreatorField::Type).unwrap();
         let date = self.refs.get(&CreatorField::Date).unwrap();
+        let event = ctx.props().event.as_ref();
 
         let button = if self.waiting {
-            html! {
-                <button class={"bg-blue-500 text-white p-2 rounded-md"}>{"Creating Event..."}</button>
+            match event {
+                Some(_) => html! {
+                    <button class={"bg-blue-500 text-white p-2 rounded-md"}>{"Updating Event..."}</button>
+                },
+                None => html! {
+                    <button class={"bg-blue-500 text-white p-2 rounded-md"}>{"Creating Event..."}</button>
+                },
             }
         } else {
-            html! {
-                <button onclick={ ctx.link().callback(|_: MouseEvent| Msg::Submit)} class={"bg-blue-500 text-white p-2 rounded-md"}>{"Create Event"}</button>
+            match event {
+                Some(_) => html! {
+                    <button onclick={ ctx.link().callback(|_: MouseEvent| Msg::Update)} class={"bg-blue-500 text-white p-2 rounded-md"}>{"Update Event"}</button>
+                },
+                None => html! {
+                    <button onclick={ ctx.link().callback(|_: MouseEvent| Msg::Create)} class={"bg-blue-500 text-white p-2 rounded-md"}>{"Create Event"}</button>
+                },
             }
         };
 
@@ -118,19 +161,24 @@ impl Component for EventCreator {
             html! {}
         };
 
+        let name_value = event.map_or_else(|| "".to_string(), |e| e.title.clone());
+        let description_value = event.map_or_else(|| "".to_string(), |e| e.description.clone());
+        let event_type_value = event.map_or_else(|| "".to_string(), |e| e.event_type.clone());
+        let date_value = event.map_or_else(|| "".to_string(), |e| e.date.clone());
+
         html! {
             <div class={"p-2"} >
                 <div class={"flex flex-col"}>
                     <label for={"event-name"}>{"Event Name"}</label>
-                    <input ref={name} id={"event-name"} type={"text"} class={"bg-gray-50 border border-gray-300 text-gray-900"} required={true} />
+                    <input value={name_value} ref={name} id={"event-name"} type={"text"} class={"bg-gray-50 border border-gray-300 text-gray-900"} required={true} />
                 </div>
                 <div class={"flex flex-col"}>
                     <label for={"event-description"}>{"Event Description"}</label>
-                    <textarea ref={description} id={"event-description"} class={"bg-gray-50 border border-gray-300 text-gray-900"} required={true} />
+                    <textarea value={description_value} ref={description} id={"event-description"} class={"bg-gray-50 border border-gray-300 text-gray-900"} required={true} />
                 </div>
                 <div class={"flex flex-col"}>
                     <label for={"event-type"}>{"Event Type"}</label>
-                    <select ref={event_type} id={"event-type"}>
+                    <select value={event_type_value} ref={event_type} id={"event-type"}>
                         <option>{"Workshop"}</option>
                         <option>{"Conference"}</option>
                         <option>{"Seminar"}</option>
@@ -138,7 +186,7 @@ impl Component for EventCreator {
                 </div>
                 <div class={"flex flex-col"}>
                     <label for={"event-date"}>{"Event Date"}</label>
-                    <input ref={date} id={"event-date"} type={"date"} class={"bg-gray-50 border border-gray-300 text-gray-900"} required={true} />
+                    <input value={date_value} ref={date} id={"event-date"} type={"date"} class={"bg-gray-50 border border-gray-300 text-gray-900"} required={true} />
                 </div>
                 { error }
                 { button }
