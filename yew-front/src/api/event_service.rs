@@ -1,10 +1,9 @@
 use gloo_net::http::Request;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, PartialEq, Deserialize, Debug)]
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
 pub struct EventEntity {
     pub id: String,
-    #[serde(rename = "name")]
     pub title: String,
     pub description: String,
     #[serde(rename = "type")]
@@ -30,5 +29,29 @@ impl EventService {
             .unwrap();
 
         fetched_events
+    }
+
+    pub async fn create_event(
+        &self,
+        name: String,
+        description: String,
+        event_type: String,
+        date: String,
+    ) {
+        let url = "/api/events";
+        let event = EventEntity {
+            id: "".to_string(),
+            title: name,
+            description,
+            event_type,
+            date,
+        };
+        Request::post(url)
+            .header("Content-Type", "application/json")
+            .body(serde_json::to_string(&event).unwrap())
+            .unwrap()
+            .send()
+            .await
+            .unwrap();
     }
 }

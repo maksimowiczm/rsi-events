@@ -1,28 +1,35 @@
-use crate::api::event_service::EventService;
-use components::event_list::EventList;
 use yew::prelude::*;
 
 mod api;
 mod components;
+mod create;
+mod home;
+
+use crate::create::Create;
+use crate::home::Home;
+use yew_router::prelude::*;
+
+#[derive(Clone, Routable, PartialEq)]
+pub enum Route {
+    #[at("/")]
+    Home,
+    #[at("/create")]
+    Create,
+}
+
+fn switch(routes: Route) -> Html {
+    match routes {
+        Route::Home => html! { <Home /> },
+        Route::Create => html! { <Create /> },
+    }
+}
 
 #[function_component]
 fn App() -> Html {
-    let event_service = EventService::new();
-    let list = use_state(|| vec![]);
-    {
-        let list = list.clone();
-        use_effect_with((), move |_| {
-            wasm_bindgen_futures::spawn_local(async move {
-                list.set(event_service.get_events().await);
-            });
-            || {}
-        });
-    }
-
     html! {
-        <div>
-            <EventList events={(*list).clone()} />
-        </div>
+        <BrowserRouter>
+            <Switch<Route> render={switch} />
+        </BrowserRouter>
     }
 }
 
