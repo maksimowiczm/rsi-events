@@ -1,6 +1,6 @@
 using Events.Application;
 using Events.Domain;
-using Events.Persistence;
+using Events.Persistence.Psql;
 using Events.Publisher.Rabbit;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +13,8 @@ builder.Services.AddSwaggerGen();
 builder.Services
     .AddService()
     .AddDomain()
-    .AddPersistenceMemory()
+    // .AddPersistenceMemory()
+    .AddPersistencePsql(builder.Configuration)
     .AddRabbitMq(builder.Configuration);
 
 var app = builder.Build();

@@ -1,6 +1,7 @@
 {
   "ConnectionStrings": {
-    "RabbitMQ": "localhost"
+    "RabbitMQ": "localhost",
+    "Postgres": "Host=127.0.0.1; Database=events; Username=postgres; Password=password"
   },
   "Logging": {
     "LogLevel": {
