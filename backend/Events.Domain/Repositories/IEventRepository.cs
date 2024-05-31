@@ -13,4 +13,8 @@ public interface IEventRepository
     void UpdateEvent(Event @event);
 
     IEnumerable<Event> GetEventsBetweenDates(DateTime start, DateTime end);
+
+    IEnumerable<Event> GetEventsByTitle(string title);
+
+    IEnumerable<Event> GetEventsByTitleBetweenDates(string title, DateTime start, DateTime end);
 }

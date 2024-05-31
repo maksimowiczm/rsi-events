@@ -67,10 +67,27 @@ public class EventService
 
         return events.Select(e => e.MapToDto());
     }
+    
+    public async Task<IEnumerable<EventDto>> GetEventsByTitleAsync(string title)
+    {
+        var events = _eventRepository.GetEventsByTitle(title).ToList();
+        events.ForEach(e => e.Visit());
+        await _unitOfWork.SaveChangesAsync();
+        
+        return events.Select(e => e.MapToDto());
+    }
 
     public async Task<IEnumerable<EventDto>> GetEventsBetweenDatesAsync(DateTime start, DateTime end)
     {
         var events = _eventRepository.GetEventsBetweenDates(start, end).ToList();
+        events.ForEach(e => e.Visit());
+        await _unitOfWork.SaveChangesAsync();
+        return events.Select(e => e.MapToDto());
+    }
+    
+    public async Task<IEnumerable<EventDto>> GetEventsByTitleBetweenDatesAsync(string title, DateTime start, DateTime end)
+    {
+        var events = _eventRepository.GetEventsByTitleBetweenDates(title, start, end).ToList();
         events.ForEach(e => e.Visit());
         await _unitOfWork.SaveChangesAsync();
         return events.Select(e => e.MapToDto());

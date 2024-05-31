@@ -24,8 +24,20 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-app.MapGet("/api/events", (EventService service, DateTime? start, DateTime? end) =>
+app.MapGet("/api/events", (EventService service, DateTime? start, DateTime? end, string? title) =>
 {
+    // bruh
+
+    if (title is not null)
+    {
+        if (start is not null && end is not null)
+        {
+            return service.GetEventsByTitleBetweenDatesAsync(title, start.Value, end.Value);
+        }
+
+        return service.GetEventsByTitleAsync(title);
+    }
+
     if (start is not null && end is not null)
     {
         return service.GetEventsBetweenDatesAsync(start.Value, end.Value);

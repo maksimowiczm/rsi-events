@@ -39,4 +39,12 @@ public class EventRepository : IEventRepository
 
     public IEnumerable<Event> GetEventsBetweenDates(DateTime start, DateTime end) =>
         _events.Where(e => e.Date >= start && e.Date <= end);
+
+    public IEnumerable<Event> GetEventsByTitle(string title) =>
+        _events.Where(e => e.Title.Contains(title, StringComparison.OrdinalIgnoreCase));
+
+    public IEnumerable<Event> GetEventsByTitleBetweenDates(string title, DateTime start, DateTime end) =>
+        _events
+            .Where(e => e.Date >= start && e.Date <= end)
+            .Where(e => e.Title.Contains(title, StringComparison.OrdinalIgnoreCase));
 }
