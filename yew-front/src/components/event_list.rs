@@ -20,7 +20,6 @@ pub fn EventList(EventListProps { events }: &EventListProps) -> Html {
 
     html! {
         <div class={"p-2"}>
-            <div class={"text-2xl"}>{"Events"}</div>
             {list}
         </div>
     }

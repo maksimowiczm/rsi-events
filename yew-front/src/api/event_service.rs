@@ -18,9 +18,13 @@ impl EventService {
         EventService {}
     }
 
-    pub async fn get_events(&self) -> Vec<EventEntity> {
-        let url = "/api/events";
-        let fetched_events: Vec<EventEntity> = Request::get(url)
+    pub async fn get_events(&self, title: Option<&str>) -> Vec<EventEntity> {
+        let url = if let Some(title) = title {
+            format!("/api/events?title={}", title)
+        } else {
+            "/api/events".to_string()
+        };
+        let fetched_events: Vec<EventEntity> = Request::get(&url)
             .send()
             .await
             .unwrap()
