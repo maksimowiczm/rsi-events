@@ -6,7 +6,7 @@ namespace Events.Persistence;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddPersistence(this IServiceCollection services)
+    public static IServiceCollection AddPersistenceMemory(this IServiceCollection services)
     {
         services.AddSingleton<IEventRepository, EventRepository>();
         services.AddSingleton<IUnitOfWork, UnitOfWork>();

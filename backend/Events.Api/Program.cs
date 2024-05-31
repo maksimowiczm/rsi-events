@@ -13,7 +13,7 @@ builder.Services.AddSwaggerGen();
 builder.Services
     .AddService()
     .AddDomain()
-    .AddPersistence()
+    .AddPersistenceMemory()
     .AddRabbitMq(builder.Configuration);
 
 var app = builder.Build();

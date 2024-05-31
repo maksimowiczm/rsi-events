@@ -1,10 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Events", "Events\Events.csproj", "{94AB856F-8A05-469D-8839-57D1DC26907E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Events.Api", "Events.Api\Events.Api.csproj", "{94AB856F-8A05-469D-8839-57D1DC26907E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Events.Domain", "Events.Domain\Events.Domain.csproj", "{6CE96676-C586-46D8-8F65-4841140DD226}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Events.Persistence", "Events.Persistence\Events.Persistence.csproj", "{782891E8-4D15-461F-8580-C1E976AF589A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Events.Persistence.Memory", "Events.Persistence.Memory\Events.Persistence.Memory.csproj", "{782891E8-4D15-461F-8580-C1E976AF589A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Events.Application", "Events.Application\Events.Application.csproj", "{602D215D-A48C-4A72-9005-7BF75A154835}"
 EndProject

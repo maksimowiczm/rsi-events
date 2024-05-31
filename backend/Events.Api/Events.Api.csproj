@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <RootNamespace>Events</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,7 +21,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Events.Application\Events.Application.csproj" />
-      <ProjectReference Include="..\Events.Persistence\Events.Persistence.csproj" />
+      <ProjectReference Include="..\Events.Persistence.Memory\Events.Persistence.Memory.csproj" />
       <ProjectReference Include="..\Events.Publisher.Rabbit\Events.Publisher.Rabbit.csproj" />
     </ItemGroup>
 
