@@ -2,6 +2,7 @@ using Events.Application;
 using Events.Domain;
 using Events.Persistence;
 using Events.Publisher.Rabbit;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,18 +41,22 @@ app.MapGet("/api/events/{id:guid}", async (EventService service, Guid id) =>
 });
 
 app.MapPost("/api/events",
-    async (EventService service, string title, string description, string type, DateTime date) =>
+    async (EventService service, [FromBody] CreateEventRequest request) =>
     {
-        var dto = await service.CreateEventAsync(title, description, type, date);
+        var dto = await service.CreateEventAsync(request.Title, request.Description, request.Type, request.Date);
         return Results.Created($"/events/{dto.Id}", dto);
     }
 );
 
 app.MapPut("/api/events/{id:guid}",
-    async (EventService service, Guid id, string? title, string? description, string? type, DateTime? date) =>
+    async (EventService service, Guid id, [FromBody] UpdateEventRequest request) =>
     {
-        var result = await service.UpdateEventAsync(id, title, description, type, date);
+        var result = await service.UpdateEventAsync(id, request.Title, request.Description, request.Type, request.Date);
         return result ? Results.NoContent() : Results.NotFound();
     });
 
 app.Run();
+
+record CreateEventRequest(string Title, string Description, string Type, DateTime Date);
+
+record UpdateEventRequest(string? Title, string? Description, string? Type, DateTime? Date);
