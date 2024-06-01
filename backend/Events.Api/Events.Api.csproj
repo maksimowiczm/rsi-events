@@ -25,6 +25,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Events.Application\Events.Application.csproj" />
+      <ProjectReference Include="..\Events.Persistence.Linq2db\Events.Persistence.Linq2db.csproj" />
       <ProjectReference Include="..\Events.Persistence.Memory\Events.Persistence.Memory.csproj" />
       <ProjectReference Include="..\Events.Persistence.EntityFramework.Psql\Events.Persistence.EntityFramework.Psql.csproj" />
       <ProjectReference Include="..\Events.Publisher.Rabbit\Events.Publisher.Rabbit.csproj" />

@@ -9,6 +9,7 @@ namespace Events.Persistence.Psql;
 
 public static class DependencyInjection
 {
+    [Obsolete("EF 💀💀💀💀💀💀💀💀💀💀💀")]
     public static IServiceCollection AddPersistencePsql(this IServiceCollection services,
         IConfiguration configuration)
     {
