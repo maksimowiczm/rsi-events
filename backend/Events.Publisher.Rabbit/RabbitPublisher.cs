@@ -19,7 +19,7 @@ public class RabbitPublisher : IPublisher, IDisposable
         _channel.QueueDeclare("events", true, false, false, null);
     }
 
-    public Task PublishAsync(INotification notification)
+    public Task PublishAsync(INotification notification, CancellationToken cancellationToken = default)
     {
         var json = JsonConvert.SerializeObject(notification, new JsonSerializerSettings
         {

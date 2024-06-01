@@ -31,7 +31,7 @@ public class EventsDbContext : DbContext, IUnitOfWork
         base.OnModelCreating(modelBuilder);
     }
 
-    async Task IUnitOfWork.SaveChangesAsync()
+    async Task IUnitOfWork.SaveChangesAsync(CancellationToken cancellationToken)
     {
         var entities = ChangeTracker
             .Entries<DomainEventsAggregate>()
@@ -42,10 +42,10 @@ public class EventsDbContext : DbContext, IUnitOfWork
         var events = entities.SelectMany(e => e.DomainEvents);
 
         entities.ForEach(e => e.ClearDomainEvents());
-        var tasks = events.Select(e => _publisher.PublishAsync(e));
+        var tasks = events.Select(e => _publisher.PublishAsync(e, cancellationToken));
 
         await Task.WhenAll(tasks);
 
-        await base.SaveChangesAsync();
+        await base.SaveChangesAsync(cancellationToken);
     }
 }

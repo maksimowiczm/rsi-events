@@ -22,19 +22,19 @@ internal class DbContext : DataConnection, IUnitOfWork
 
     public void Track(DomainEventsAggregate aggregate) => _trackedAggregates.Add(aggregate);
 
-    public async Task SaveChangesAsync()
+    public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var domainEvents = _trackedAggregates.SelectMany(aggregate => aggregate.DomainEvents).ToList();
         _trackedAggregates.ForEach(a => a.ClearDomainEvents());
         _trackedAggregates.Clear();
 
-        var tasks = domainEvents.Select(e => _publisher.PublishAsync(e));
+        var tasks = domainEvents.Select(e => _publisher.PublishAsync(e, cancellationToken));
 
         await Task.WhenAll(tasks);
 
         if (Transaction is not null)
         {
-            await base.CommitTransactionAsync();
+            await base.CommitTransactionAsync(cancellationToken);
         }
     }
 }

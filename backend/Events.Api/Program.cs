@@ -26,46 +26,59 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-app.MapGet("/api/events", (EventService service, DateTime? start, DateTime? end, string? title) =>
-{
-    // bruh
-
-    if (title is not null)
+app.MapGet("/api/events",
+    (EventService service, DateTime? start, DateTime? end, string? title, CancellationToken cancellationToken) =>
     {
-        if (start is not null && end is not null)
+        // bruh
+
+        if (title is not null)
         {
-            return service.GetEventsByTitleBetweenDatesAsync(title, start.Value, end.Value);
+            if (start is not null && end is not null)
+            {
+                return service.GetEventsByTitleBetweenDatesAsync(title, start.Value, end.Value, cancellationToken);
+            }
+
+            return service.GetEventsByTitleAsync(title, cancellationToken);
         }
 
-        return service.GetEventsByTitleAsync(title);
-    }
+        if (start is not null && end is not null)
+        {
+            return service.GetEventsBetweenDatesAsync(start.Value, end.Value, cancellationToken);
+        }
 
-    if (start is not null && end is not null)
-    {
-        return service.GetEventsBetweenDatesAsync(start.Value, end.Value);
-    }
+        return service.GetEventsAsync(cancellationToken);
+    });
 
-    return service.GetEventsAsync();
-});
-
-app.MapGet("/api/events/{id:guid}", async (EventService service, Guid id) =>
+app.MapGet("/api/events/{id:guid}", async (EventService service, Guid id, CancellationToken cancellationToken) =>
 {
-    var dto = await service.GetEventAsync(id);
+    var dto = await service.GetEventAsync(id, cancellationToken);
     return dto is not null ? Results.Ok(dto) : Results.NotFound();
 });
 
 app.MapPost("/api/events",
-    async (EventService service, [FromBody] CreateEventRequest request) =>
+    async (EventService service, [FromBody] CreateEventRequest request, CancellationToken cancellationToken) =>
     {
-        var dto = await service.CreateEventAsync(request.Title, request.Description, request.Type, request.Date);
+        var dto = await service.CreateEventAsync(
+            request.Title,
+            request.Description,
+            request.Type,
+            request.Date,
+            cancellationToken
+        );
         return Results.Created($"/events/{dto.Id}", dto);
     }
 );
 
 app.MapPut("/api/events/{id:guid}",
-    async (EventService service, Guid id, [FromBody] UpdateEventRequest request) =>
+    async (EventService service, Guid id, [FromBody] UpdateEventRequest request, CancellationToken cancellationToken) =>
     {
-        var result = await service.UpdateEventAsync(id, request.Title, request.Description, request.Type, request.Date);
+        var result = await service.UpdateEventAsync(id,
+            request.Title,
+            request.Description,
+            request.Type,
+            request.Date,
+            cancellationToken
+        );
         return result ? Results.NoContent() : Results.NotFound();
     });
 

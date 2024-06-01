@@ -4,24 +4,19 @@ using Events.Domain.Repositories;
 
 namespace Events.Application;
 
-public class EventService
+public class EventService(EventFactory eventFactory, IEventRepository eventRepository, IUnitOfWork unitOfWork)
 {
-    private readonly EventFactory _eventFactory;
-    private readonly IEventRepository _eventRepository;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public EventService(EventFactory eventFactory, IEventRepository eventRepository, IUnitOfWork unitOfWork)
+    public async Task<EventDto> CreateEventAsync(
+        string title,
+        string description,
+        string eventType,
+        DateTime time,
+        CancellationToken cancellationToken = default
+    )
     {
-        _eventFactory = eventFactory;
-        _eventRepository = eventRepository;
-        _unitOfWork = unitOfWork;
-    }
-
-    public async Task<EventDto> CreateEventAsync(string title, string description, string eventType, DateTime time)
-    {
-        var @event = _eventFactory.CreateEvent(title, description, eventType, time);
-        _eventRepository.AddEvent(@event);
-        await _unitOfWork.SaveChangesAsync();
+        var @event = eventFactory.CreateEvent(title, description, eventType, time);
+        eventRepository.AddEvent(@event);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         return @event.MapToDto();
     }
 
@@ -30,66 +25,79 @@ public class EventService
         string? title,
         string? description,
         string? eventType,
-        DateTime? date
+        DateTime? date,
+        CancellationToken cancellationToken = default
     )
     {
-        var @event = _eventRepository.GetEvent(id);
+        var @event = eventRepository.GetEvent(id);
         if (@event is not null)
         {
             @event.Update(title, description, eventType, date);
-            _eventRepository.UpdateEvent(@event);
-            await _unitOfWork.SaveChangesAsync();
+            eventRepository.UpdateEvent(@event);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return true;
         }
 
         return false;
     }
 
-    public async Task<EventDto?> GetEventAsync(Guid id)
+    public async Task<EventDto?> GetEventAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var @event = _eventRepository.GetEvent(id);
+        var @event = eventRepository.GetEvent(id);
         if (@event is null)
         {
             return null;
         }
 
         @event.Visit();
-        await _unitOfWork.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return @event.MapToDto();
     }
 
-    public async Task<IEnumerable<EventDto>> GetEventsAsync()
+    public async Task<IEnumerable<EventDto>> GetEventsAsync(CancellationToken cancellationToken = default)
     {
-        var events = _eventRepository.GetEvents().ToList();
+        var events = eventRepository.GetEvents().ToList();
         events.ForEach(e => e.Visit());
-        await _unitOfWork.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return events.Select(e => e.MapToDto());
     }
-    
-    public async Task<IEnumerable<EventDto>> GetEventsByTitleAsync(string title)
+
+    public async Task<IEnumerable<EventDto>> GetEventsByTitleAsync(
+        string title,
+        CancellationToken cancellationToken = default
+    )
     {
-        var events = _eventRepository.GetEventsByTitle(title).ToList();
+        var events = eventRepository.GetEventsByTitle(title).ToList();
         events.ForEach(e => e.Visit());
-        await _unitOfWork.SaveChangesAsync();
-        
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
         return events.Select(e => e.MapToDto());
     }
 
-    public async Task<IEnumerable<EventDto>> GetEventsBetweenDatesAsync(DateTime start, DateTime end)
+    public async Task<IEnumerable<EventDto>> GetEventsBetweenDatesAsync(
+        DateTime start,
+        DateTime end,
+        CancellationToken cancellationToken = default
+    )
     {
-        var events = _eventRepository.GetEventsBetweenDates(start, end).ToList();
+        var events = eventRepository.GetEventsBetweenDates(start, end).ToList();
         events.ForEach(e => e.Visit());
-        await _unitOfWork.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         return events.Select(e => e.MapToDto());
     }
-    
-    public async Task<IEnumerable<EventDto>> GetEventsByTitleBetweenDatesAsync(string title, DateTime start, DateTime end)
+
+    public async Task<IEnumerable<EventDto>> GetEventsByTitleBetweenDatesAsync(
+        string title,
+        DateTime start,
+        DateTime end,
+        CancellationToken cancellationToken = default
+    )
     {
-        var events = _eventRepository.GetEventsByTitleBetweenDates(title, start, end).ToList();
+        var events = eventRepository.GetEventsByTitleBetweenDates(title, start, end).ToList();
         events.ForEach(e => e.Visit());
-        await _unitOfWork.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         return events.Select(e => e.MapToDto());
     }
 }

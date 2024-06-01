@@ -6,7 +6,7 @@ namespace Events.Persistence;
 
 public class UnitOfWork(IEventRepository eventsRepository, IPublisher publisher) : IUnitOfWork
 {
-    public async Task SaveChangesAsync()
+    public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var entities = eventsRepository.GetEvents();
 
@@ -15,7 +15,7 @@ public class UnitOfWork(IEventRepository eventsRepository, IPublisher publisher)
             var domainEvents = entity.DomainEvents;
             foreach (var notification in domainEvents)
             {
-                await publisher.PublishAsync(notification);
+                await publisher.PublishAsync(notification, cancellationToken);
             }
 
             entity.ClearDomainEvents();
