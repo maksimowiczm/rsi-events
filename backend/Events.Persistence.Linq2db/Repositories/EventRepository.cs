@@ -53,7 +53,9 @@ internal class EventRepository(DbContext context) : IEventRepository
 
     public IEnumerable<Event> GetEventsByTitle(string title)
     {
-        var events = context.Events.Where(e => e.Title == title).ToList();
+        var events = context.Events
+            .Where(e => e.Title.Contains(title, StringComparison.OrdinalIgnoreCase))
+            .ToList();
         Track(events);
         return events;
     }
