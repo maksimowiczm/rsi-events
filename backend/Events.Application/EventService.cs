@@ -5,7 +5,12 @@ using Events.Domain.Repositories;
 
 namespace Events.Application;
 
-public class EventService(EventFactory eventFactory, IEventRepository eventRepository, IUnitOfWork unitOfWork)
+public class EventService(
+    EventFactory eventFactory,
+    IEventRepository eventRepository,
+    IUnitOfWork unitOfWork,
+    IPdfEventService pdfEventService
+)
 {
     public async Task<EventDto> CreateEventAsync(
         string title,
@@ -100,5 +105,35 @@ public class EventService(EventFactory eventFactory, IEventRepository eventRepos
         events.ForEach(e => e.Visit());
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return events.Select(e => e.MapToDto());
+    }
+
+    public Task<byte[]?> GetEventPdfAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var @event = eventRepository.GetEvent(id);
+        if (@event is null)
+        {
+            return Task.FromResult<byte[]?>(null);
+        }
+
+        var pdf = pdfEventService.Generate(@event);
+
+        return Task.FromResult(pdf);
+    }
+
+    public Task<byte[]> GetEventsPdfAsync(
+        DateTime? start,
+        DateTime? end,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var events = (start, end) switch
+        {
+            (not null, not null) => eventRepository.GetEventsBetweenDates(start.Value, end.Value),
+            _ => eventRepository.GetEvents()
+        };
+
+        var pdf = pdfEventService.Generate(events);
+
+        return Task.FromResult(pdf);
     }
 }

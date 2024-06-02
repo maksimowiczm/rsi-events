@@ -1,5 +1,6 @@
 using Events.Application;
 using Events.Domain;
+using Events.Pdf;
 using Events.Persistence.Linq2db;
 using Events.Publisher.Rabbit;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,7 @@ builder.Services
     // .AddPersistenceMemory()
     // .AddPersistencePsql(builder.Configuration)
     .AddPersistenceLinq2db(builder.Configuration)
+    .AddPdf()
     .AddRabbitMq(builder.Configuration);
 
 var app = builder.Build();
@@ -54,6 +56,25 @@ app.MapGet("/api/events/{id:guid}", async (EventService service, Guid id, Cancel
     var dto = await service.GetEventAsync(id, cancellationToken);
     return dto is not null ? Results.Ok(dto) : Results.NotFound();
 });
+
+app.MapGet("/api/events/{id:guid}/pdf",
+    async (EventService service, Guid id, CancellationToken cancellationToken) =>
+    {
+        var pdf = await service.GetEventPdfAsync(id, cancellationToken);
+        if (pdf is null)
+        {
+            return Results.NotFound();
+        }
+
+        return Results.Stream(new MemoryStream(pdf), "application/pdf");
+    });
+
+app.MapGet("/api/events/pdf",
+    async (EventService service, DateTime? start, DateTime? end, CancellationToken cancellationToken) =>
+    {
+        var pdf = await service.GetEventsPdfAsync(start, end, cancellationToken);
+        return Results.Stream(new MemoryStream(pdf), "application/pdf");
+    });
 
 app.MapPost("/api/events",
     async (EventService service, [FromBody] CreateEventRequest request, CancellationToken cancellationToken) =>

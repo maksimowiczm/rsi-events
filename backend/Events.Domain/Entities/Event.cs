@@ -4,8 +4,9 @@ namespace Events.Domain.Entities;
 
 public class Event : DomainEventsAggregate
 {
-    private Event(string title, string description, string eventType, DateTime date)
+    private Event(Guid id, string title, string description, string eventType, DateTime date)
     {
+        Id = id;
         Title = title;
         Description = description;
         EventType = eventType;
@@ -14,12 +15,12 @@ public class Event : DomainEventsAggregate
 
     internal static Event Create(string title, string description, string eventType, DateTime date)
     {
-        var evt = new Event(title, description, eventType, date);
+        var evt = new Event(Guid.NewGuid(), title, description, eventType, date);
         evt.Raise(new NewEventCreated(title, date));
         return evt;
     }
 
-    public Guid Id { get; } = Guid.NewGuid();
+    public Guid Id { get; private set; }
 
     public string Title { get; private set; }
 

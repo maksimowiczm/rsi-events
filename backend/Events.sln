@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Persistence", "Persistence"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Events.Persistence.Linq2db", "Events.Persistence.Linq2db\Events.Persistence.Linq2db.csproj", "{37724D75-D2F3-4FC6-92CE-84E81460FCB2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Events.Pdf", "Events.Pdf\Events.Pdf.csproj", "{469233BF-A175-4369-B611-8F936C5479B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{37724D75-D2F3-4FC6-92CE-84E81460FCB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37724D75-D2F3-4FC6-92CE-84E81460FCB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37724D75-D2F3-4FC6-92CE-84E81460FCB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{469233BF-A175-4369-B611-8F936C5479B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{469233BF-A175-4369-B611-8F936C5479B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{469233BF-A175-4369-B611-8F936C5479B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{469233BF-A175-4369-B611-8F936C5479B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{53E1343F-606F-4C60-9222-7E4086132FBC} = {3EECA34B-ADF0-4DB3-AFEC-38E81625F951}
