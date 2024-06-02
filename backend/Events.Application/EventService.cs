@@ -1,3 +1,4 @@
+using Events.Application.Abstractions;
 using Events.Application.Dto;
 using Events.Domain.Entities;
 using Events.Domain.Repositories;

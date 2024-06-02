@@ -1,5 +1,5 @@
 using System.Reflection;
-using Events.Application;
+using Events.Application.Abstractions;
 using Events.Domain.Entities;
 using Events.Publisher;
 using Microsoft.EntityFrameworkCore;

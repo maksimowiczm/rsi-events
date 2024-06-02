@@ -1,4 +1,4 @@
-namespace Events.Application;
+namespace Events.Application.Abstractions;
 
 public interface IUnitOfWork
 {

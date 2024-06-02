@@ -1,4 +1,4 @@
-using Events.Application;
+using Events.Application.Abstractions;
 using Events.Domain.Repositories;
 using Events.Persistence.Psql.Repositories;
 using Microsoft.EntityFrameworkCore;
