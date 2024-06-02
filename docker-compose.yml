@@ -26,13 +26,16 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: ./Events/Dockerfile
+      dockerfile: ./Events.Api/Dockerfile
     depends_on:
       rabbitmq:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
     environment:
       - "ASPNETCORE_URLS=http://+:5000"
       - "ConnectionStrings:RabbitMQ=rabbitmq"
+      - "ConnectionStrings:Postgres2db=Host=postgres; Database=linq2db; Username=postgres; Password=password"
 
   statistics:
     build:
@@ -52,4 +55,25 @@ services:
       timeout: 10s
       retries: 5
     ports:
+      - "5672:5672"
       - "15672:15672"
+
+  postgres:
+    image: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      PGDATA: /var/lib/postgresql/data/
+      POSTGRES_DB: linq2db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
