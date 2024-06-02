@@ -153,12 +153,11 @@ impl Component for EventCreator {
             }
         };
 
-        let error = if self.error {
-            html! {
+        let error = match self.error {
+            true => html! {
                 <div class={"text-red-500"}>{"All fields are required"}</div>
-            }
-        } else {
-            html! {}
+            },
+            false => html! {},
         };
 
         let name_value = event.map_or_else(|| "".to_string(), |e| e.title.clone());

@@ -59,7 +59,11 @@ pub fn EventComponent(EventComponentProps { event }: &EventComponentProps) -> Ht
                 <button class={"m-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"}>
                     <Link<Route> to={Route::Edit { id: event.id.clone() }}>{"edit"}</Link<Route>>
                 </button>
-                <button class={"m-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full "}>{"pdf"}</button>
+                <button class={"m-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full "}>
+                    <a href={format!("/api/events/{}/pdf", event.id)} target={"_blank"}>
+                        {"pdf"}
+                    </a>
+                </button>
             </div>
         </div>
     }
