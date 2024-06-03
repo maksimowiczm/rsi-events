@@ -18,8 +18,19 @@ impl EventService {
         EventService {}
     }
 
-    pub async fn get_events(&self, title: Option<&str>) -> Vec<EventEntity> {
-        let url = if let Some(title) = title {
+    pub async fn get_events(
+        &self,
+        title: Option<&str>,
+        dates: Option<(&str, &str)>,
+    ) -> Vec<EventEntity> {
+        let url = if let (Some(title), Some(dates)) = (title, dates) {
+            format!(
+                "/api/events?title={}start={}&end={}",
+                title, dates.0, dates.1
+            )
+        } else if let (None, Some(dates)) = (title, dates) {
+            format!("/api/events?start={}&end={}", dates.0, dates.1)
+        } else if let (Some(title), None) = (title, dates) {
             format!("/api/events?title={}", title)
         } else {
             "/api/events".to_string()
