@@ -46,17 +46,15 @@ impl EventService {
         fetched_events
     }
 
-    pub async fn get_event(&self, id: &str) -> EventEntity {
+    pub async fn get_event(&self, id: &str) -> Option<EventEntity> {
         let url = format!("/api/events/{}", id);
-        let fetched_event: EventEntity = Request::get(&url)
-            .send()
-            .await
-            .unwrap()
-            .json()
-            .await
-            .unwrap();
+        let response = Request::get(&url).send().await.unwrap();
 
-        fetched_event
+        if response.status() == 200 {
+            response.json().await.ok()
+        } else {
+            None
+        }
     }
 
     pub async fn create_event(
