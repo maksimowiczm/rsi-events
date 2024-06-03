@@ -1,7 +1,6 @@
 use crate::api::event_service::EventService;
 use crate::components::event_list::EventList;
 use crate::Route;
-use gloo_console::info;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -29,7 +28,6 @@ pub fn Home() -> Html {
                     let dates = if let (Some(from), Some(to)) =
                         ((*search_from).as_deref(), (*search_to).as_deref())
                     {
-                        info!((*search).as_deref(), from, to);
                         Some((from, to))
                     } else {
                         None
@@ -77,6 +75,28 @@ pub fn Home() -> Html {
         }
     };
 
+    let on_clear = {
+        let search = search.clone();
+        let search_ref = search_ref.clone();
+        let search_from = search_from.clone();
+        let search_from_ref = search_from_ref.clone();
+        let search_to = search_to.clone();
+        let search_to_ref = search_to_ref.clone();
+        move |_| {
+            let search_ref = search_ref.cast::<web_sys::HtmlInputElement>().unwrap();
+            search_ref.set_value("");
+            search.set(None);
+
+            let search_from_ref = search_from_ref.cast::<web_sys::HtmlInputElement>().unwrap();
+            search_from_ref.set_value("");
+            search_from.set(None);
+
+            let search_to_ref = search_to_ref.cast::<web_sys::HtmlInputElement>().unwrap();
+            search_to_ref.set_value("");
+            search_to.set(None);
+        }
+    };
+
     html! {
         <div class={"p-2"}>
             <div class={"p-2"}>
@@ -93,6 +113,7 @@ pub fn Home() -> Html {
                 <div class={"flex justify-center items-center px-2"}>{"to"}</div>
                 <input ref={search_to_ref} type="date" class={"ml-2 border-2"} />
                 <button onclick={on_search.clone()} class={"bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full ml-2"}>{"Search"}</button>
+                <button onclick={on_clear.clone()} class={"bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full ml-2"}>{"Clear"}</button>
             </div>
             <EventList events={(*list).clone()} />
         </div>
