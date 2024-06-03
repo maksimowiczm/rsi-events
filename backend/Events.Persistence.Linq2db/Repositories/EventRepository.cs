@@ -44,6 +44,12 @@ internal class EventRepository(DbContext context) : IEventRepository
         Track(@event);
     }
 
+    public void DeleteEvent(Event @event)
+    {
+        context.BeginTransaction();
+        context.Delete(@event);
+    }
+
     public IEnumerable<Event> GetEventsBetweenDates(DateTime start, DateTime end)
     {
         var events = context.Events.Where(e => e.Date >= start && e.Date <= end).ToList();

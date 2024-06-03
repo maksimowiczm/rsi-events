@@ -1,14 +1,15 @@
 using Events.Application;
 using Events.Application.Dto;
+using Events.Presentation.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RiskFirst.Hateoas;
-using RiskFirst.Hateoas.Polyfills;
 
 namespace Events.Presentation.Controllers;
 
 [ApiController]
 [Route("/api/[controller]")]
-public class EventsController(EventService service, ILinksService link, IAssemblyLoader assemblyLoader) : ControllerBase
+public class EventsController(EventService service, ILinksService link) : ControllerBase
 {
     [HttpGet(Name = "GetAllEventsRoute")]
     public async Task<IEnumerable<EventDto>> GetEvents(
@@ -58,7 +59,7 @@ public class EventsController(EventService service, ILinksService link, IAssembl
             request.Date,
             cancellationToken
         );
-        
+
         await link.AddLinksAsync(dto);
 
         return CreatedAtAction(nameof(GetEvent), new { id = dto.Id }, dto);
@@ -79,8 +80,16 @@ public class EventsController(EventService service, ILinksService link, IAssembl
             request.Date,
             cancellationToken
         );
-        
+
         return dto ? NoContent() : NotFound();
+    }
+
+    [HttpDelete("{id:guid}")]
+    [Authorize(Roles = Roles.Admin)]
+    public async Task<IActionResult> DeleteEvent(Guid id, CancellationToken cancellationToken)
+    {
+        var deleted = await service.DeleteEventAsync(id, cancellationToken);
+        return deleted ? NoContent() : NotFound();
     }
 
     [HttpGet("{id:guid}/pdf")]

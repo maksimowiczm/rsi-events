@@ -1,9 +1,12 @@
+using Events;
 using Events.Application;
 using Events.Domain;
 using Events.Pdf;
 using Events.Persistence.Linq2db;
 using Events.Presentation;
+using Events.Presentation.Authentication;
 using Events.Publisher.Rabbit;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +16,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
+builder.Services.AddAuthentication("BasicAuthentication")
+    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 builder.Services
     .AddService()
     .AddDomain()

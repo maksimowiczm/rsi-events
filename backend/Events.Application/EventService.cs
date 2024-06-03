@@ -136,4 +136,18 @@ public class EventService(
 
         return Task.FromResult(pdf);
     }
+
+    public async Task<bool> DeleteEventAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var @event = eventRepository.GetEvent(id);
+        if (@event is null)
+        {
+            return false;
+        }
+
+        eventRepository.DeleteEvent(@event);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return true;
+    }
 }
