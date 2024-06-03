@@ -40,6 +40,33 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.MapControllers();
 
+app.Use(async (context, next) =>
+{
+    var originalBodyStream = context.Response.Body;
+    using var responseBodyStream = new MemoryStream();
+    context.Response.Body = responseBodyStream;
+
+    await next.Invoke();
+
+    if (context.Response.StatusCode is < 200 or >= 300)
+    {
+        var client = new HttpClient();
+        var response = await client.GetAsync($"https://http.cat/images/{context.Response.StatusCode}.jpg");
+        var imageBytes = await response.Content.ReadAsByteArrayAsync();
+
+        context.Response.Body = originalBodyStream;
+        context.Response.ContentLength = imageBytes.Length;
+        context.Response.ContentType = "image/jpeg";
+
+        await context.Response.Body.WriteAsync(imageBytes);
+        return;
+    }
+
+    context.Response.Body = originalBodyStream;
+    responseBodyStream.Seek(0, SeekOrigin.Begin);
+    await responseBodyStream.CopyToAsync(context.Response.Body);
+});
+
 app.Run();
 
 internal class DefaultPublisher : IPublisher
