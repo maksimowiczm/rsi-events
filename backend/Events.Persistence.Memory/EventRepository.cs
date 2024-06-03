@@ -37,6 +37,8 @@ public class EventRepository : IEventRepository
         }
     }
 
+    public void DeleteEvent(Event @event) => _events.Remove(@event);
+
     public IEnumerable<Event> GetEventsBetweenDates(DateTime start, DateTime end) =>
         _events.Where(e => e.Date >= start && e.Date <= end);
 

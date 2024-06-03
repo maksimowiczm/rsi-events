@@ -13,6 +13,8 @@ public class EventRepository(EventsDbContext context) : IEventRepository
 
     public void UpdateEvent(Event @event) => context.Events.Update(@event);
 
+    public void DeleteEvent(Event @event) => context.Events.Remove(@event);
+
     public IEnumerable<Event> GetEventsBetweenDates(DateTime start, DateTime end) =>
         context.Events.Where(e => e.Date >= start && e.Date <= end);
 
