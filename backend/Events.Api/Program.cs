@@ -5,6 +5,7 @@ using Events.Pdf;
 using Events.Persistence.Linq2db;
 using Events.Presentation;
 using Events.Presentation.Authentication;
+using Events.Publisher;
 using Events.Publisher.Rabbit;
 using Microsoft.AspNetCore.Authentication;
 
@@ -25,8 +26,10 @@ builder.Services
     // .AddPersistencePsql(builder.Configuration)
     .AddPersistenceLinq2db(builder.Configuration)
     .AddPdf()
-    .AddPresentation()
-    .AddRabbitMq(builder.Configuration);
+    .AddPresentation();
+// .AddRabbitMq(builder.Configuration);
+
+builder.Services.AddScoped<IPublisher, DefaultPublisher>();
 
 var app = builder.Build();
 
@@ -38,3 +41,8 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+
+internal class DefaultPublisher : IPublisher
+{
+    public Task PublishAsync(INotification notification, CancellationToken cancellationToken) => Task.CompletedTask;
+}
