@@ -35,7 +35,7 @@ pub struct EventComponentProps {
 #[function_component]
 pub fn EventComponent(EventComponentProps { event }: &EventComponentProps) -> Html {
     html! {
-        <div class={"border-2 mt-2 p-2 flex flex-row"}>
+        <div class={"border-2 mt-2 p-2 flex flex-col"}>
             <div class={"flex grow flex-col"}>
                 <div class={"flex"}>
                     <div>{"Title:"}</div>
@@ -54,7 +54,7 @@ pub fn EventComponent(EventComponentProps { event }: &EventComponentProps) -> Ht
                     <div class={"pl-2"}>{&event.date}</div>
                 </div>
             </div>
-            <div class={"flex flex-col"}>
+            <div class={"flex flex-row"}>
                 <div class={"grow"}></div>
                 <button class={"m-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"}>
                     <Link<Route> to={Route::Edit { id: event.id.clone() }}>{"edit"}</Link<Route>>
@@ -63,6 +63,9 @@ pub fn EventComponent(EventComponentProps { event }: &EventComponentProps) -> Ht
                     <a href={format!("/api/events/{}/pdf", event.id)} target={"_blank"}>
                         {"pdf"}
                     </a>
+                </button>
+                <button class={"m-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full"}>
+                    <Link<Route> to={Route::Delete { id: event.id.clone() }}>{"delete"}</Link<Route>>
                 </button>
             </div>
         </div>

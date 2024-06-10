@@ -105,4 +105,14 @@ impl EventService {
             .await
             .unwrap();
     }
+
+    pub async fn delete_event(&self, id: &str, token: &str) -> bool {
+        let url = format!("/api/events/{}", id);
+        Request::delete(&url)
+            .header("Authorization", &format!("Bearer {}", token))
+            .send()
+            .await
+            .unwrap()
+            .ok()
+    }
 }
