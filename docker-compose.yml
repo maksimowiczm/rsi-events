@@ -26,8 +26,8 @@ services:
       context: ./backend
       dockerfile: ./Events.Api/Dockerfile
     depends_on:
-      # rabbitmq:
-        # condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
       postgres:
         condition: service_healthy
     environment:
@@ -35,26 +35,26 @@ services:
       - "ConnectionStrings:RabbitMQ=rabbitmq"
       - "ConnectionStrings:Postgres2db=Host=postgres; Database=linq2db; Username=postgres; Password=password"
 
-  # statistics:
-  #   build:
-  #     context: ./statistics
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     rabbitmq:
-  #       condition: service_healthy
-  #   environment:
-  #     AMQP_ADDR: "amqp://rabbitmq:5672/%2f"
+  statistics:
+    build:
+      context: ./statistics
+      dockerfile: Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      AMQP_ADDR: "amqp://rabbitmq:5672/%2f"
 
-  # rabbitmq:
-  #   image: rabbitmq:3-management
-  #   healthcheck:
-  #     test: rabbitmq-diagnostics -q ping
-  #     interval: 10s
-  #     timeout: 10s
-  #     retries: 5
-  #   ports:
-  #     - "5672:5672"
-  #     - "15672:15672"
+  rabbitmq:
+    image: rabbitmq:3-management
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    ports:
+      - "5672:5672"
+      - "15672:15672"
 
   postgres:
     image: postgres

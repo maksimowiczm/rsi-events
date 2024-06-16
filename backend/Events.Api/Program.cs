@@ -1,4 +1,3 @@
-using Events;
 using Events.Application;
 using Events.Domain;
 using Events.Pdf;
@@ -26,10 +25,10 @@ builder.Services
     // .AddPersistencePsql(builder.Configuration)
     .AddPersistenceLinq2db(builder.Configuration)
     .AddPdf()
-    .AddPresentation();
-// .AddRabbitMq(builder.Configuration);
+    .AddPresentation()
+    .AddRabbitMq(builder.Configuration);
 
-builder.Services.AddScoped<IPublisher, DefaultPublisher>();
+// builder.Services.AddScoped<IPublisher, DefaultPublisher>();
 
 var app = builder.Build();
 

@@ -117,7 +117,7 @@ public class EventService(
 
         var pdf = pdfEventService.Generate(@event);
 
-        return Task.FromResult(pdf);
+        return Task.FromResult<byte[]?>(pdf);
     }
 
     public Task<byte[]> GetEventsPdfAsync(
